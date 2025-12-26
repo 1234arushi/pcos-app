@@ -2,7 +2,6 @@ package controller
 
 import (
 	"backend/patient/process"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +15,10 @@ func CreatePatient(c *gin.Context) {
 	if err = (&patient).ValidateReq(c); err == nil {
 		data, err = (&patient).ProcessReq(c)
 	}
-	c.JSON(http.StatusOK, data)
+	if err != nil {
+		c.JSON(400, data)
+		return
+	}
+	c.JSON(200, data)
 
 }
