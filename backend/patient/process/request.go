@@ -8,3 +8,7 @@ type PatientRequest struct {
 	Gender    *string `json:"gender"`
 	Email     *string `json:"email"`
 }
+
+type ListPatientReq struct {
+	UserID uint64 `json:"user_id"`
+}

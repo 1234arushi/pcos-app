@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/database/model"
 	"backend/login"
+	"backend/middleware"
 	"backend/patient"
 
 	"github.com/gin-contrib/cors"
@@ -14,8 +15,10 @@ import (
 func mountRoutes(r *gin.Engine) {
 	route := r.Group("pcos")
 	{
-		patient.LoadServices(route)
+
 		login.LoadServices(route)
+		route.Use(middleware.AuthMiddleware())
+		patient.LoadServices(route)
 	}
 }
 
@@ -30,7 +33,7 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
 	mountRoutes(r)

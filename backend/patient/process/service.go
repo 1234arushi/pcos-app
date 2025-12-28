@@ -8,6 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (p *ListPatientReq) ProcessReq(c *gin.Context) (resp response.APIResponse, err error) {
+	dbConn := database.GetConn()
+	var (
+		patients []model.Patient
+	)
+	if err = dbConn.Model(&model.Patient{}).Where("fk_user_id = ?", p.UserID).Find(&patients).Error; err != nil {
+		resp = response.Failure(err.Error())
+		return
+
+	}
+	resp = response.Success("patients fetched successfully", patients)
+
+	return
+}
+
 func (patient *PatientRequest) ProcessReq(c *gin.Context) (resp response.APIResponse, err error) {
 	dbConn := database.GetConn()
 	// var (

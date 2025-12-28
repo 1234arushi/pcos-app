@@ -22,3 +22,19 @@ func CreatePatient(c *gin.Context) {
 	c.JSON(200, data)
 
 }
+
+func ListPatients(c *gin.Context) {
+	var (
+		p    process.ListPatientReq
+		data interface{}
+		err  error
+	)
+	if err = (&p).ValidateReq(c); err == nil {
+		data, err = (&p).ProcessReq(c)
+	}
+	if err != nil {
+		c.JSON(400, data)
+		return
+	}
+	c.JSON(200, data)
+}

@@ -88,7 +88,9 @@ func (user *LoginReq) ProcessReq(c *gin.Context) (resp response.APIResponse, err
 		return
 	}
 
-	resp = response.Success("login successfull", token)
+	resp = response.Success("login successfull", map[string]interface{}{
+		"token": token,
+	})
 
 	return
 }

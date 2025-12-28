@@ -1,36 +1,37 @@
 "use client";//we need UI interactions
 
 import { useState } from "react";//react hook to store values in UI
+import toast from "react-hot-toast";
 
 export default function EmailScreen() {
   const [email, setEmail] = useState("")//initially email is empty,when a value is entered,then using setEmail ->email value gets updated without re-loading
-  const [msg, setMsg] = useState("")
   const [loading, setLoading] = useState(false)//ensures that button is clickable
   //async ->means a function will do some work that takes time like calling an API and we want to wait for it without freezing the UI.
   async function handleContinue() {
     if (!email) {
-      return setMsg("Please enter email");
+      return toast.error("Please enter email");
     }
     setLoading(true);
-    setMsg("");
     try {
       //fetch -> browser version of Postman
       const res = await fetch(//await -> pause until backend replies
         `http://localhost:8080/pcos/v1/verifyEmail?email=${email}`
       );
       const data = await res.json();
-      setMsg(data.msg);
-      console.log(data.data?.exists)
+      if (data.msg) {
+        toast.success(data.msg);
+      }
+
 
       if (data.data?.exists) {//email exists
         //go to login page
-        window.location.href = `/login?email=${email}`;
+        window.location.href = `/auth/login?email=${email}`;
       } else {
-        window.location.href = `/signUp?email=${email}`;
+        window.location.href = `/auth/signUp?email=${email}`;
       }
     } catch (e) {
-      console.log("hy", e)
-      setMsg("something went wrong");
+
+      toast.error("Something went wrong. Please try again.");
 
     } finally {
       setLoading(false);
@@ -56,7 +57,6 @@ export default function EmailScreen() {
         {loading ? "checking.." : "Continue"}
 
       </button>
-      <p>{msg}</p>
 
 
     </div>
