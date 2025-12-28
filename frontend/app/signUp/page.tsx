@@ -43,6 +43,10 @@ export default function SignUpPage() {
             });
             const data = await res.json();
             setMsg(data.msg ?? "Signed up successfully");//if backend did'nt send any message then success message from frontend
+            const token = data.data?.token
+            if (token) {
+                localStorage.setItem("auth_token", token);
+            }
 
 
         } catch (e) {

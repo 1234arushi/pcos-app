@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/database/model"
 	"backend/login/util"
+	"backend/middleware"
 	"backend/response"
 
 	"github.com/gin-gonic/gin"
@@ -27,8 +28,8 @@ func (user *EmailCheckReq) ProcessReq(c *gin.Context) (resp response.APIResponse
 func (user *SignUpReq) ProcessReq(c *gin.Context) (resp response.APIResponse, err error) {
 	dbConn := database.GetConn()
 	var (
-		existing   model.User
-		hashedPass string
+		existing          model.User
+		hashedPass, token string
 	)
 	if err = dbConn.Where("email = ?", user.Email).First(&existing).Error; err == nil {
 		resp = response.Failure("email already exists")
@@ -51,7 +52,16 @@ func (user *SignUpReq) ProcessReq(c *gin.Context) (resp response.APIResponse, er
 		resp = response.Failure(err.Error())
 		return
 	}
-	resp = response.Success("Account created!", newUser)
+	token, err = middleware.GenerateJWT(existing.UserID)
+	if err != nil {
+		resp = response.Failure("error generating token")
+		return
+	}
+
+	resp = response.Success("Account created!", map[string]interface{}{
+		"token": token,
+		"user":  newUser,
+	})
 
 	return
 }
@@ -60,6 +70,7 @@ func (user *LoginReq) ProcessReq(c *gin.Context) (resp response.APIResponse, err
 	dbConn := database.GetConn()
 	var (
 		existing model.User
+		token    string
 	)
 	if err = dbConn.Where("email = ?", user.Email).First(&existing).Error; err != nil {
 		resp = response.Failure("invalid email/password")
@@ -71,7 +82,13 @@ func (user *LoginReq) ProcessReq(c *gin.Context) (resp response.APIResponse, err
 		return
 
 	}
-	resp = response.Success("login successfull", nil)
+	token, err = middleware.GenerateJWT(existing.UserID)
+	if err != nil {
+		resp = response.Failure("error generating token")
+		return
+	}
+
+	resp = response.Success("login successfull", token)
 
 	return
 }

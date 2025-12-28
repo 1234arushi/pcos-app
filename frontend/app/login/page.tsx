@@ -40,6 +40,10 @@ export default function LoginPage() {
 
             }
             setMsg(data.msg ?? "Login Successfull")
+            const token = data.data?.token
+            if (token) {
+                localStorage.setItem("auth_token", token);
+            }
 
 
 
@@ -87,7 +91,7 @@ export default function LoginPage() {
                     {loading ? "Logging in..." : "Login"}
                 </button>
 
-               
+
             </Card>
         </>
 

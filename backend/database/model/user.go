@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// users are doctors
 type User struct {
 	UserID    uint64     `json:"user_id" gorm:"column:user_id;primaryKey;autoIncrement"`
 	Name      string     `json:"name" gorm:"column:name;type:varchar(255)"`
