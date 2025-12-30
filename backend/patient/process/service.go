@@ -25,10 +25,15 @@ func (p *ListPatientReq) ProcessReq(c *gin.Context) (resp response.APIResponse, 
 
 func (patient *PatientRequest) ProcessReq(c *gin.Context) (resp response.APIResponse, err error) {
 	dbConn := database.GetConn()
-	// var (
-	// 	p mapper.PatientResp
-	// )
-	if err = dbConn.Model(&model.Patient{}).Create(&patient).Error; err != nil {
+	p := map[string]interface{}{
+		"Name":     patient.Name,
+		"Age":      patient.Age,
+		"Phone":    patient.Phone,
+		"Email":    patient.Email,
+		"FkUserID": &patient.FkUserID,
+	}
+
+	if err = dbConn.Model(&model.Patient{}).Create(p).Error; err != nil {
 		resp = response.Failure(err.Error())
 		return
 

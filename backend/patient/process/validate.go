@@ -8,9 +8,11 @@ import (
 )
 
 func (patient *PatientRequest) ValidateReq(c *gin.Context) (err error) {
+
 	if err = c.ShouldBindJSON(&patient); err != nil {
 		return fmt.Errorf("invalid request body : %w", err)
 	}
+	patient.FkUserID = middleware.GetUserFromContext(c)
 
 	return
 }
