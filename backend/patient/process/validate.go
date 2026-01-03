@@ -21,3 +21,11 @@ func (reqModel *ListPatientReq) ValidateReq(c *gin.Context) (err error) {
 	reqModel.UserID = middleware.GetUserFromContext(c)
 	return
 }
+
+func (reqModel *PcosAnalysisReq) ValidateReq(c *gin.Context) (err error) {
+	if err = c.ShouldBindJSON(&reqModel); err != nil {
+		return fmt.Errorf("invalid request body : %w", err)
+	}
+	reqModel.UserID = middleware.GetUserFromContext(c)
+	return
+}

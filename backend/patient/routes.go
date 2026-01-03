@@ -12,6 +12,7 @@ func LoadServices(r *gin.RouterGroup) {
 	{
 		patient.GET("/list/", controller.ListPatients)
 		patient.POST("/create/", controller.CreatePatient)
+		patient.POST("/analysis/", controller.DoAnalysis)
 
 	}
 

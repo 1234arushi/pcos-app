@@ -28,7 +28,8 @@ func main() {
 	}
 
 	database.GetConn().AutoMigrate(&model.Patient{}) //auto-creates table
-	database.GetConn().AutoMigrate(&model.User{})    //auto-creates table
+	database.GetConn().AutoMigrate(&model.User{})
+	database.GetConn().AutoMigrate(&model.PcosAnalysis{})
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},

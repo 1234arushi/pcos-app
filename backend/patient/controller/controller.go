@@ -38,3 +38,20 @@ func ListPatients(c *gin.Context) {
 	}
 	c.JSON(200, data)
 }
+
+func DoAnalysis(c *gin.Context) {
+	var (
+		req  process.PcosAnalysisReq
+		data interface{}
+		err  error
+	)
+	if err = (&req).ValidateReq(c); err == nil {
+		data, err = (&req).ProcessReq(c)
+
+	}
+	if err != nil {
+		c.JSON(400, data)
+		return
+	}
+	c.JSON(200, data)
+}
