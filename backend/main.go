@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/database/model"
 	"backend/login"
+	"backend/logout"
 	"backend/middleware"
 	"backend/patient"
 
@@ -19,6 +20,7 @@ func mountRoutes(r *gin.Engine) {
 		login.LoadServices(route)
 		route.Use(middleware.AuthMiddleware())
 		patient.LoadServices(route)
+		logout.LoadServices(route)
 	}
 }
 

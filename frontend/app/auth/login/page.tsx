@@ -25,7 +25,7 @@ export default function LoginPage() {
         setLoading(true)//to prevent double clicks
 
         try {
-            const res = await fetch("http://localhost:8080/pcos/v1/login/", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/pcos/v1/login/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -33,7 +33,7 @@ export default function SignUpPage() {
 
         try {
             const res = await fetch(
-                "http://localhost:8080/pcos/v1/signUp/", {
+                `${process.env.NEXT_PUBLIC_API_BASE}/pcos/v1/signUp/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"//explicitly mentioning that json body is sent

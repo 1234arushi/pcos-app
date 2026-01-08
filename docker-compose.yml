@@ -1,0 +1,46 @@
+version : "3.9" #this is docker-compose specification version
+
+#each service = 1 container
+# image:postgres16 used from docker hub,hence we are not building postgres image
+# environment: create db-user postgres,set password and create db
+# host:container
+services:
+  postgres:
+    image: postgres:16
+    container_name: pcos_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: pcos_db
+    ports: 
+      - "5555:5432"
+  backend:
+    build: ./backend
+    container_name: pcos_backend
+    depends_on:
+      - postgres
+      - ml-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASS: 1234
+      DB_NAME: pcos_db
+      DB_PORT: 5432
+    ports:
+      - "8080:8080"
+  ml-service:
+    build: ./ml-service
+    container_name: pcos_ml
+    restart: always
+    ports:
+      - "8005:8005" 
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_BASE: http://backend:8080
+    container_name: pcos_frontend
+    depends_on: 
+      - backend
+    ports: 
+      - "3000:3000"

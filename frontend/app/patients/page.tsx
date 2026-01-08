@@ -77,7 +77,7 @@ export default function PatientsPage() {
     async function fetchPatients() {
         try {
             const token = localStorage.getItem("auth_token") ?? "";//fixed token : string|null issue
-            const res = await fetch("http://localhost:8080/pcos/patient/list/", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/pcos/patient/list/`, {
                 headers: {
                     Authorization: token
                 }
@@ -106,7 +106,7 @@ export default function PatientsPage() {
     async function handleCreate() {
         try {
             const token = localStorage.getItem("auth_token") ?? "";
-            const res = await fetch("http://localhost:8080/pcos/patient/create/", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/pcos/patient/create/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export default function PatientsPage() {
         try {
             const token = localStorage.getItem("auth_token") ?? "";
             const res = await fetch(
-                "http://localhost:8080/pcos/patient/analysis/",
+                `${process.env.NEXT_PUBLIC_API_BASE}/pcos/patient/analysis/`,
                 {
                     method: "POST",
                     headers: {

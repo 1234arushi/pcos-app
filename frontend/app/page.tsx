@@ -15,7 +15,7 @@ export default function EmailScreen() {
     try {
       //fetch -> browser version of Postman
       const res = await fetch(//await -> pause until backend replies
-        `http://localhost:8080/pcos/v1/verifyEmail?email=${email}`
+        `${process.env.NEXT_PUBLIC_API_BASE}/pcos/v1/verifyEmail?email=${email}`
       );
       const data = await res.json();
       if (data.msg) {

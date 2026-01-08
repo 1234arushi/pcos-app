@@ -52,7 +52,7 @@ func (user *SignUpReq) ProcessReq(c *gin.Context) (resp response.APIResponse, er
 		resp = response.Failure(err.Error())
 		return
 	}
-	token, err = middleware.GenerateJWT(existing.UserID)
+	token, err = middleware.GenerateJWT(newUser.UserID)
 	if err != nil {
 		resp = response.Failure("error generating token")
 		return
