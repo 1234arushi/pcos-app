@@ -3,7 +3,7 @@ version : "3.9" #this is docker-compose specification version
 #each service = 1 container
 # image:postgres16 used from docker hub,hence we are not building postgres image
 # environment: create db-user postgres,set password and create db
-# host:container
+# host port:container
 services:
   postgres:
     image: postgres:16
@@ -14,7 +14,10 @@ services:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: pcos_db
     ports: 
-      - "5555:5432"
+      - "5555:5432" 
+    volumes:
+      # pcos_pg_data->docker managed folder stored in default path mentioned
+      - pcos_pg_data:/var/lib/postgresql/data #vol mount,it stores postgres data outside the container,so it survives restarts
   backend:
     build: ./backend
     container_name: pcos_backend
@@ -44,3 +47,6 @@ services:
       - backend
     ports: 
       - "3000:3000"
+  
+volumes:
+  pcos_pg_data:

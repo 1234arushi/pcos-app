@@ -52,7 +52,7 @@ func (req *PcosAnalysisReq) ProcessReq(c *gin.Context) (resp response.APIRespons
 		httpResp *http.Response
 	)
 	dbConn := database.GetConn()
-	pythonURL := "http://localhost:8005/predict"
+	pythonURL := "http://ml-service:8005/predict"
 
 	//converting map into JSON for python
 	symptomBytes, _ := json.Marshal(req.Symptoms)
