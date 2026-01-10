@@ -23,10 +23,13 @@ func InitDB() (err error) {
 	if err != nil {
 		return fmt.Errorf("error loading .env file : %v", err)
 	}
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"),
+			os.Getenv("DB_NAME"))
+	}
 
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"),
-		os.Getenv("DB_NAME"))
 	for i := 0; i < 10; i++ {
 		conn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
