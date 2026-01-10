@@ -10,10 +10,10 @@ app=FastAPI(
     version="1.0"
 )
 
-@app.on_event("startup")
-def startup_event():
-    load_model()
-    print("Model loaded & ready")
+# @app.on_event("startup")
+# def startup_event():
+#     load_model()
+#     print("Model loaded & ready")
 
 # BaseModel  used to define input schemas
 class PatientInput(BaseModel):
