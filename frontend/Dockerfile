@@ -3,6 +3,9 @@
 FROM node:20-alpine AS builder
 
 WORKDIR /app
+# 🔑 Build-time env (THIS IS THE KEY FIX)
+ARG NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
 
 COPY package*.json ./
 
