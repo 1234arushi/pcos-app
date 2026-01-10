@@ -29,7 +29,7 @@ func main() {
 	if err := database.InitDB(); err != nil {
 		panic(err)
 	}
-	frontendURL := os.Getenv("FRONTEND_URL")
+	frontendURL := os.Getenv("FRONTEND_URL")         //cors : cross origin resource sharing
 	database.GetConn().AutoMigrate(&model.Patient{}) //auto-creates table
 	database.GetConn().AutoMigrate(&model.User{})
 	database.GetConn().AutoMigrate(&model.PcosAnalysis{})
