@@ -7,6 +7,7 @@ import (
 	"backend/logout"
 	"backend/middleware"
 	"backend/patient"
+	"os"
 
 	"github.com/gin-contrib/cors"
 
@@ -28,13 +29,13 @@ func main() {
 	if err := database.InitDB(); err != nil {
 		panic(err)
 	}
-
+	frontendURL := os.Getenv("FRONTEND_URL")
 	database.GetConn().AutoMigrate(&model.Patient{}) //auto-creates table
 	database.GetConn().AutoMigrate(&model.User{})
 	database.GetConn().AutoMigrate(&model.PcosAnalysis{})
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{frontendURL},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
