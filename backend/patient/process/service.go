@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,7 +53,12 @@ func (req *PcosAnalysisReq) ProcessReq(c *gin.Context) (resp response.APIRespons
 		httpResp *http.Response
 	)
 	dbConn := database.GetConn()
-	pythonURL := "http://ml-service:8005/predict"
+	mlURL := os.Getenv("ML_SERVICE_URL")
+	if mlURL == "" {
+		// local docker-compose fallback
+		mlURL = "http://ml-service:8005"
+	}
+	pythonURL := mlURL + "/predict"
 
 	//converting map into JSON for python
 	symptomBytes, _ := json.Marshal(req.Symptoms)
