@@ -6,6 +6,8 @@ import (
 	"backend/response"
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 
@@ -74,6 +76,14 @@ func (req *PcosAnalysisReq) ProcessReq(c *gin.Context) (resp response.APIRespons
 	}
 	defer httpResp.Body.Close()
 	//reading python response
+	if httpResp.StatusCode != http.StatusOK {
+		//this is required when fastAPI gives error,it's format is in HTML
+		body, _ := io.ReadAll(httpResp.Body)
+		resp = response.Failure(
+			fmt.Sprintf("ML error %d: %s", httpResp.StatusCode, string(body)),
+		)
+		return
+	}
 	if err = json.NewDecoder(httpResp.Body).Decode(&mlresp); err != nil {
 		resp = response.Failure(err.Error())
 		return
