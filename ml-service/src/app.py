@@ -31,7 +31,8 @@ class PatientInput(BaseModel):
     menstrual_days: int
     marriage_yrs: int
 
-@app.get("/health")#every 5 minutes uptime robot pings ml/health route
+@app.head("/health")#every 5 minutes uptime robot pings ml/health route
+@app.get("/health")
 def health():
     return {"status": "ok"}
 
