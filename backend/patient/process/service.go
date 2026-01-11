@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,42 +55,68 @@ func (req *PcosAnalysisReq) ProcessReq(c *gin.Context) (resp response.APIRespons
 		mlresp   response.MLResp
 		httpResp *http.Response
 	)
+
 	dbConn := database.GetConn()
+
 	mlURL := os.Getenv("ML_SERVICE_URL")
 	if mlURL == "" {
-		// local docker-compose fallback
 		mlURL = "http://ml-service:8005"
 	}
 	pythonURL := mlURL + "/predict"
 
-	//converting map into JSON for python
-	symptomBytes, _ := json.Marshal(req.Symptoms)
-	httpResp, err = http.Post(
-		pythonURL,
-		"application/json",
-		bytes.NewBuffer(symptomBytes),
-	)
+	// marshal payload
+	symptomBytes, err := json.Marshal(req.Symptoms)
 	if err != nil {
-		resp = response.Failure(err.Error())
+		resp = response.Failure("invalid input payload")
 		return
-
 	}
-	defer httpResp.Body.Close()
-	//reading python response
-	if httpResp.StatusCode != http.StatusOK {
-		//this is required when fastAPI gives error,it's format is in HTML
-		body, _ := io.ReadAll(httpResp.Body)
+
+	// HTTP client with timeout
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
+
+	// retry loop
+	for attempt := 1; attempt <= 3; attempt++ {
+		httpResp, err = client.Post(
+			pythonURL,
+			"application/json",
+			bytes.NewBuffer(symptomBytes),
+		)
+
+		if err == nil && httpResp.StatusCode == http.StatusOK {
+			break
+		}
+
+		if httpResp != nil {
+			body, _ := io.ReadAll(httpResp.Body)
+			fmt.Println(
+				"ML attempt", attempt,
+				"failed:", httpResp.StatusCode,
+				string(body),
+			)
+			httpResp.Body.Close() //one attempt request done,now close its response
+		}
+
+		time.Sleep(time.Duration(attempt*2) * time.Second)
+	}
+
+	// after retries
+	if httpResp == nil || httpResp.StatusCode != http.StatusOK {
 		resp = response.Failure(
-			fmt.Sprintf("ML error %d: %s", httpResp.StatusCode, string(body)),
+			"ML service is waking up. Please try again in a few seconds.",
 		)
 		return
 	}
-	if err = json.NewDecoder(httpResp.Body).Decode(&mlresp); err != nil {
-		resp = response.Failure(err.Error())
-		return
+	defer httpResp.Body.Close()
 
+	// decode JSON
+	if err = json.NewDecoder(httpResp.Body).Decode(&mlresp); err != nil {
+		resp = response.Failure("invalid ML response")
+		return
 	}
 
+	// save result
 	record := model.PcosAnalysis{
 		FkPatientID: &req.PatientID,
 		InputJson:   symptomBytes,
@@ -97,11 +124,12 @@ func (req *PcosAnalysisReq) ProcessReq(c *gin.Context) (resp response.APIRespons
 		RiskLabel:   &mlresp.RiskLabel,
 		FkUserID:    &req.UserID,
 	}
+
 	if err = dbConn.Create(&record).Error; err != nil {
 		resp = response.Failure(err.Error())
 		return
-
 	}
+
 	resp = response.Success("Analysis Saved.", gin.H{
 		"id":          record.ID,
 		"probability": mlresp.Probability,
