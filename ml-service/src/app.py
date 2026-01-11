@@ -31,6 +31,11 @@ class PatientInput(BaseModel):
     menstrual_days: int
     marriage_yrs: int
 
+@app.get("/health")#every 5 minutes uptime robot pings ml/health route
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/predict")
 def predict(input : PatientInput):
     bundle = load_model()
